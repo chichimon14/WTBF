@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"electron .\"",
     "electron:build": "vite build && electron-builder --win --x64",
-    "dist": "electron-builder --win --x64"
+    "dist": "electron-builder --win --x64 --verbose"
   },
   "dependencies": {
     "jszip": "^3.10.1",
@@ -31,7 +31,7 @@
   },
   "build": {
     "appId": "com.chichimon14.wordfiller",
-    "productName": "Word智能填充系统",
+    "productName": "WordFiller",
     "directories": {
       "output": "release"
     },
