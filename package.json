@@ -2,6 +2,8 @@
   "name": "word-highlight-filler",
   "private": true,
   "version": "1.0.0",
+  "description": "Symmetric wizard UI for batch Word document filler with text highlights and asterisk segments replacement",
+  "author": "chichimon14 <chichimon14@github.com>",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
