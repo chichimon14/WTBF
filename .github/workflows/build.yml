@@ -1,0 +1,50 @@
+name: Build and Release Windows Client
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*' # 只要推送 v1.0.0 等版本标签，就自动编译并发布到 GitHub Release
+  workflow_dispatch: # 支持在 GitHub 网页上点击按钮手动运行打包
+
+permissions:
+  contents: write # 给予 Action 权限在 Release 页面自动创建和上传二进制附件
+
+jobs:
+  build:
+    runs-on: windows-latest # 运行在 GitHub 纯正的 Windows 云端服务器上
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Compile and Package Windows EXE
+        run: npm run electron:build
+
+      - name: Upload Build Artifacts to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: WordFiller-Windows-Build
+          path: |
+            release/*.exe
+          retention-days: 7
+
+      - name: Create and Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            release/*.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
