@@ -1,0 +1,53 @@
+name: Clean Failed Runs
+on:
+  push:
+    branches:
+      - main
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete failed runs
+        run: |
+          node -e "
+          const https = require('https');
+          const token = process.env.GITHUB_TOKEN;
+          const repo = 'chichimon14/WTBF';
+          
+          function req(path, method, callback) {
+            const options = {
+              hostname: 'api.github.com',
+              path: path,
+              method: method,
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'User-Agent': 'node',
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            };
+            const r = https.request(options, res => {
+              let data = '';
+              res.on('data', chunk => data += chunk);
+              res.on('end', () => callback(data, res.statusCode));
+            });
+            r.end();
+          }
+
+          req('/repos/' + repo + '/actions/runs?per_page=100', 'GET', (data) => {
+            const obj = JSON.parse(data);
+            const runs = obj.workflow_runs || [];
+            console.log('Total runs found:', runs.length);
+            runs.forEach(run => {
+              if (run.conclusion === 'failure') {
+                console.log('Deleting failed run:', run.id);
+                req('/repos/' + repo + '/actions/runs/' + run.id, 'DELETE', (d, code) => {
+                  console.log('Deleted run', run.id, 'response code:', code);
+                });
+              }
+            });
+          });
+          "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
