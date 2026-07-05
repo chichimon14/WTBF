@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"electron .\"",
     "electron:build": "vite build && electron-builder --win --x64",
-    "dist": "electron-builder --win --x64 --verbose"
+    "dist": "electron-builder --win --x64"
   },
   "dependencies": {
     "jszip": "^3.10.1",
