@@ -52,5 +52,9 @@ jobs:
           files: |
             release/*.exe
           generate_release_notes: true
+          body: |
+            ## 兼容性说明 / Compatibility Notes
+            - **[win7可用]** 此版本已将 Electron 核心降级至 22.3.27，解决了新版内核中对 `DiscardVirtualMemory` 接口调用引起的崩溃问题。
+            - 本版本已完美兼容运行在 **Windows 7**、Windows 8/8.1、Windows 10 和 Windows 11 上。
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
