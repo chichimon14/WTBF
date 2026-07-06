@@ -110,14 +110,29 @@ function extractMarkersFromXml(xmlDoc) {
     // --- 2. 星号提取 ---
     let pText = '';
     const runNodes = [];
+    const highlightedRanges = [];
+    
     for (const child of childNodes) {
       if (child.nodeName === 'w:r') {
-        pText += getRunText(child);
+        const text = getRunText(child);
+        const start = pText.length;
+        pText += text;
+        const end = pText.length;
         runNodes.push(child);
+        
+        if (hasHighlight(child) && text !== '') {
+          highlightedRanges.push({ start, end });
+        }
       }
     }
 
     if (pText === '') continue;
+
+    const isOverlappingHighlight = (matchStart, matchEnd) => {
+      return highlightedRanges.some(r => {
+        return matchStart < r.end && matchEnd > r.start;
+      });
+    };
 
     const promptStarRegex = /\*{1,3}([^*，。、；：！？“”‘’()（）\s\r\n]{1,15})\*{1,3}/g;
     const pureStarRegex = /\*{3,}/g;
@@ -128,6 +143,12 @@ function extractMarkersFromXml(xmlDoc) {
     while ((match = promptStarRegex.exec(pText)) !== null) {
       const matchText = match[0];
       const matchIndex = match.index;
+      const matchEnd = matchIndex + matchText.length;
+      
+      if (isOverlappingHighlight(matchIndex, matchEnd)) {
+        continue;
+      }
+      
       const cleaned = cleanPromptText(matchText);
       
       detectedStars.push({
@@ -142,6 +163,11 @@ function extractMarkersFromXml(xmlDoc) {
     while ((match = pureStarRegex.exec(pText)) !== null) {
       const matchText = match[0];
       const matchIndex = match.index;
+      const matchEnd = matchIndex + matchText.length;
+      
+      if (isOverlappingHighlight(matchIndex, matchEnd)) {
+        continue;
+      }
       
       const isOverlapped = detectedStars.some(ds => 
         matchIndex >= ds.index && (matchIndex + matchText.length) <= (ds.index + ds.length)
