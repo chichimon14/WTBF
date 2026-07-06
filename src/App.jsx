@@ -99,7 +99,7 @@ export default function App() {
   const fileInputRef = useRef(null);
   const projectInputRef = useRef(null);
 
-  const isElectron = window && window.process && window.process.type;
+  const isElectron = !!(window && window.ipcRenderer);
 
   // --- 脏数据自愈升级机制 ---
   useEffect(() => {
