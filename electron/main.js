@@ -10,6 +10,7 @@ function createWindow() {
     height: 850,
     title: 'Word 智能格式填充系统',
     backgroundColor: '#f8fafc',
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
